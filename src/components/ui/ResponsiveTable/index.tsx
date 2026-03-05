@@ -1,15 +1,15 @@
 "use client";
 
 import React from 'react';
-import { Table, TableProps } from '@heroui/react';
+import { Table } from '@heroui/react';
 
 interface ResponsiveTableProps {
   children?: React.ReactNode;
-  mobileCardRenderer?: (item: any) => React.ReactNode;
-  data?: any[];
+  mobileCardRenderer?: (item: unknown) => React.ReactNode;
+  data?: unknown[];
   showMobileCards?: boolean;
   className?: string;
-  [key: string]: any; // Para permitir outras props do Table
+  [key: string]: unknown; // Para permitir outras props do Table
 }
 
 export default function ResponsiveTable({ 
@@ -32,7 +32,7 @@ export default function ResponsiveTable({
               {...props}
               className={`min-w-full ${className}`}
             >
-              {children as any}
+              {children as unknown}
             </Table>
           </div>
         </div>
@@ -56,7 +56,7 @@ export default function ResponsiveTable({
         {...props}
         className={`min-w-full ${className}`}
       >
-        {children as any}
+        {children as unknown}
       </Table>
     </div>
   );

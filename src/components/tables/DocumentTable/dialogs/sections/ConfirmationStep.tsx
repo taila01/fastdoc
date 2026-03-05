@@ -1,44 +1,41 @@
 import React from "react";
-import { AdminCreateData } from "@/services/interfaces/Admin/AdminInterface";
+import { Document } from "@/services/interfaces/Document/DocumentInterface";
 
 interface ConfirmationStepProps {
-  formData: AdminCreateData;
+  formData: Document;
 }
+
 export default function ConfirmationStep({ formData }: ConfirmationStepProps) {
   return (
-      <div className="grid gap-4 px-1">
-            <div className="col-span-full">
-                <h4 className="pb-4 text-base font-medium text-gray-800 dark:text-white/90">
-                    Confirme os dados do usuário
-                </h4>
-            </div>
-      <div>
-        <strong>Nome:</strong> {formData.firstname} {formData.lastname}
+    <div className="grid gap-4 px-1">
+      <div className="col-span-full">
+        <h4 className="pb-4 text-base font-medium text-gray-800 dark:text-white/90">
+          Confirme os dados do documento
+        </h4>
       </div>
 
       <div>
-        <strong>Email:</strong> {formData.email}
+        <strong>ID:</strong> {formData.id || "Será gerado automaticamente"}
       </div>
 
       <div>
-        <strong>Email verificado:</strong>{" "}
-        {formData.emailVerifiedAt ? "Sim" : "Não"}
+        <strong>Título:</strong> {formData.titulo}
       </div>
 
       <div>
-        <strong>Ativo:</strong> {formData.isActive ? "Sim" : "Não"}
+        <strong>Descrição:</strong> {formData.descricao}
       </div>
 
-     <div>
-    <strong>Criado em:</strong>{" "}
-      {formData.createdAt ? new Date(formData.createdAt).toLocaleString() : "N/A"}
-    </div>
+      <div>
+        <strong>Status:</strong> {formData.status}
+      </div>
 
-    <div>
-      <strong>Atualizado em:</strong>{" "}
-      {formData.updatedAt ? new Date(formData.updatedAt).toLocaleString() : "N/A"}
-    </div>
-
+      <div>
+        <strong>Criado em:</strong>{" "}
+        {formData.criado_em
+          ? new Date(formData.criado_em).toLocaleString()
+          : "N/A"}
+      </div>
     </div>
   );
 }

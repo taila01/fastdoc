@@ -58,10 +58,15 @@ export default function DocumentForm({ isOpen, onClose, document = null }: Docum
   }, [onClose, resetForm]);
 
   useEffect(() => {
-    if (document) setFormData(document);
+    if (document) {
+      const id = setTimeout(() => setFormData(document), 0);
+      return () => clearTimeout(id);
+    }
   }, [document]);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
     const { id, value } = e.target;
     setFormData({ ...formData, [id]: value });
   };
@@ -72,16 +77,21 @@ export default function DocumentForm({ isOpen, onClose, document = null }: Docum
   };
 
   useEffect(() => {
-    if (isSuccess) {
-      HotToast({ title: "Sucesso!", message: "Documento criado com sucesso!", type: "success" });
-      handleClose();
-    }
-    if (isError) {
-      HotToast({
-        title: "Erro...",
-        message: error instanceof Error ? error.message : "Erro ao criar documento",
-        type: "error"
-      });
+    if (isSuccess || isError) {
+      const id = setTimeout(() => {
+        if (isSuccess) {
+          HotToast({ title: "Sucesso!", message: "Documento criado com sucesso!", type: "success" });
+          handleClose();
+        }
+        if (isError) {
+          HotToast({
+            title: "Erro...",
+            message: error instanceof Error ? error.message : "Erro ao criar documento",
+            type: "error"
+          });
+        }
+      }, 0);
+      return () => clearTimeout(id);
     }
   }, [isSuccess, isError, error, handleClose]);
 
