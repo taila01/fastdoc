@@ -1,24 +1,25 @@
-import Axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, AxiosError } from "axios";
+import axios, { AxiosInstance, AxiosResponse, AxiosError, InternalAxiosRequestConfig } from "axios";
 
-const axios: AxiosInstance = Axios.create({
-  baseURL: process.env.NEXT_PUBLIC_BACKEND_URL,
+const axiosInstance: AxiosInstance = axios.create({
+  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3333",
   timeout: 10000,
-  headers: { "Content-Type": "application/json", Accept: "application/json" },
+  headers: {
+    "Content-Type": "application/json",
+    Accept: "application/json",
+  },
 });
 
-axios.interceptors.request.use((config: AxiosRequestConfig) => {
-  if (config.method === "put" || config.method === "patch") {
-    config.url = config.url?.includes("?") 
-      ? `${config.url}&_method=${config.method}` 
-      : `${config.url}?_method=${config.method}`;
-    config.method = "post";
-  }
-  return config;
-});
-
-axios.interceptors.response.use(
-  (response: AxiosResponse) => response,
-  (error: AxiosError) => Promise.reject(error)
+axiosInstance.interceptors.request.use(
+  (config: InternalAxiosRequestConfig) => config,
+  (error) => Promise.reject(error)
 );
 
-export default axios;
+axiosInstance.interceptors.response.use(
+  (response: AxiosResponse) => response,
+  (error: AxiosError) => {
+    console.error("Erro na API:", error.response?.data || error.message);
+    return Promise.reject(error);
+  }
+);
+
+export default axiosInstance;

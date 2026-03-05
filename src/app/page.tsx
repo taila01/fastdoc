@@ -1,22 +1,47 @@
 'use client';
 
-import DocumentTable from '@/components/tables/DocumentTable';
+import dynamic from 'next/dynamic';
 
-export default function Home() {
+const DocumentTable = dynamic(
+  () => import('@/components/tables/DocumentTable'),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="flex h-full w-full items-center justify-center bg-[#030712]">
+        <div className="text-brand-500 animate-pulse font-medium">
+          Carregando documentos...
+        </div>
+      </div>
+    ),
+  }
+);
+
+export default function Page() {
   return (
-    <div className="flex min-h-screen flex-col bg-zinc-50 dark:bg-black p-8">
-      <header className="mb-8 flex items-center justify-between">
-        <h1 className="text-3xl font-semibold text-black dark:text-zinc-50">
-          Documentos
-        </h1>
-        <p className="text-zinc-600 dark:text-zinc-400">
-          Gerencie os documentos cadastrados no sistema.
-        </p>
-      </header>
+    <div className="flex h-screen w-full bg-[#030712] overflow-hidden">
 
-      <section className="w-full">
-        <DocumentTable />
-      </section>
+      <div className="flex-1 relative m-4 rounded-3xl border border-neutral-800 bg-[#030712] overflow-hidden shadow-2xl">
+        
+        <div className="h-full w-full overflow-y-auto p-8">
+
+          <header className="mb-8">
+            <h1 className="text-3xl font-semibold text-white">
+              Documentos
+            </h1>
+
+            <p className="text-gray-400 mt-2">
+              Gerencie os documentos cadastrados no sistema.
+            </p>
+          </header>
+
+          <div className="rounded-2xl border border-neutral-800 bg-neutral-900 p-6 shadow-xl">
+            <DocumentTable />
+          </div>
+
+        </div>
+
+      </div>
+
     </div>
   );
 }

@@ -16,13 +16,13 @@ import { formatDate } from "@/utils/formatters";
 import { useDocuments } from "@/hooks/document/useDocuments";
 import { Document } from "@/services/interfaces/Document/DocumentInterface";
 
-import TableBottomContent from "@/components/tables/DocumentTable/components/TableBottomContent";
-import DocumentDeleteDialog from "@/components/tables/DocumentTable/dialogs/DocumentDeleteDialog";
-import DocumentViewDialog from "@/components/tables/DocumentTable/dialogs/DocumentViewDialog";
-import DocumentEditDialog from "@/components/tables/DocumentTable/dialogs/DocumentEditDialog";
-import TableTopContent from "@/components/tables/DocumentTable/components/TableTopContent";
+import TableBottomContent from "./components/TableBottomContent";
+import DocumentDeleteDialog from "./dialogs/DocumentDeleteDialog";
+import DocumentViewDialog from "./dialogs/DocumentViewDialog";
+import DocumentEditDialog from "./dialogs/DocumentEditDialog";
+import TableTopContent from "./components/TableTopContent";
 import TableLoading from "@/components/tables/TableLoading";
-import TableActions from "@/components/tables/DocumentTable/components/TableActions";
+import TableActions from "./components/TableActions";
 
 export default function DocumentTable() {
   const [page, setPage] = useState(1);
@@ -33,14 +33,16 @@ export default function DocumentTable() {
   const [statusFilter, setStatusFilter] = useState<Selection>("all");
 
   const { data, isLoading } = useDocuments(page, rowsPerPage, filterValue);
-  const meta = data?.meta;
 
   const documentsData = useMemo(() => {
-    if (!data?.data) return [];
-    return Array.isArray(data.data) ? data.data : [data.data as Document];
+    if (!data) return [];
+    const actualData = data.data || data;
+    return Array.isArray(actualData) ? actualData : [actualData];
   }, [data]);
 
+  const meta = data?.meta;
   const visibleColumns = useMemo(() => new Set(INITIAL_VISIBLE_COLUMNS), []);
+  
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
@@ -50,84 +52,52 @@ export default function DocumentTable() {
     direction: "ascending",
   });
 
-  const handleView = useCallback((doc: Document) => {
+  const handleOpenModal = useCallback((doc: Document, type: "view" | "delete" | "edit") => {
     setDocumentData(doc);
-    setIsViewDialogOpen(true);
+    if (type === "view") setIsViewDialogOpen(true);
+    if (type === "delete") setIsDeleteDialogOpen(true);
+    if (type === "edit") setIsEditDialogOpen(true);
   }, []);
 
-  const handleDelete = useCallback((doc: Document) => {
-    setDocumentData(doc);
-    setIsDeleteDialogOpen(true);
-  }, []);
+  const renderCell = useCallback((document: Document, columnKey: keyof Document | "actions") => {
+    const cellValue = document[columnKey as keyof Document];
 
-  const handleEdit = useCallback((doc: Document) => {
-    setDocumentData(doc);
-    setIsEditDialogOpen(true);
-  }, []);
-
-  const handleOpenModal = useCallback(
-    (doc: Document, type: "view" | "delete" | "edit") => {
-      if (type === "view") handleView(doc);
-      if (type === "delete") handleDelete(doc);
-      if (type === "edit") handleEdit(doc);
-    },
-    [handleView, handleDelete, handleEdit]
-  );
-
-  const pages = Math.ceil((meta?.total ?? 0) / rowsPerPage);
-  const hasSearchFilter = Boolean(filterValue);
-
-  const headerColumns = useMemo(() => {
-    return documentColumns.filter((column) => Array.from(visibleColumns).includes(column.uid));
-  }, [visibleColumns]);
+    switch (columnKey) {
+      case "titulo":
+        return <p className="font-medium text-md">{document.titulo || ""}</p>;
+      case "descricao":
+        return <p className="text-md">{document.descricao || ""}</p>;
+      case "criado_em":
+        return <p className="text-md">{document.criado_em ? formatDate(document.criado_em) : ""}</p>;
+      case "status":
+        return (
+          <div className="flex items-center gap-2">
+            <span className={`w-2 h-2 rounded-full ${document.status === "assinado" ? "bg-green-500" : "bg-gray-400"}`} />
+            <span>{document.status === "assinado" ? "Assinado" : "Pendente"}</span>
+          </div>
+        );
+      case "actions":
+        return (
+          <TableActions
+            onView={(doc) => handleOpenModal(doc, "view")}
+            onDelete={(doc) => handleOpenModal(doc, "delete")}
+            onEdit={(doc) => handleOpenModal(doc, "edit")}
+            documentData={document}
+          />
+        );
+      default:
+        return cellValue ? String(cellValue) : "";
+    }
+  }, [handleOpenModal]);
 
   const sortedItems = useMemo(() => {
-    if (!documentsData || documentsData.length === 0) return [];
-    return [...documentsData].sort((a: Document, b: Document) => {
+    return [...documentsData].sort((a, b) => {
       const first = String(a[sortDescriptor.column as keyof Document] || "");
       const second = String(b[sortDescriptor.column as keyof Document] || "");
       const cmp = first < second ? -1 : first > second ? 1 : 0;
       return sortDescriptor.direction === "descending" ? -cmp : cmp;
     });
   }, [sortDescriptor, documentsData]);
-
-  const renderCell = useCallback(
-    (document: Document, columnKey: keyof Document | "actions") => {
-      const cellValue = document[columnKey as keyof Document];
-
-      switch (columnKey) {
-        case "titulo":
-          return <p className="text-bold text-md">{document.titulo || ""}</p>;
-        case "descricao":
-          return <p className="text-md">{document.descricao || ""}</p>;
-        case "criado_em":
-          return <p className="text-md">{document.criado_em ? formatDate(document.criado_em) : ""}</p>;
-        case "status":
-          return (
-            <div className="flex items-center">
-              <span
-                className={`inline-block w-2 h-2 rounded-full mr-2 ${
-                  document.status === "assinado" ? "bg-green-500" : "bg-gray-400"
-                }`}
-              />
-              <span>{document.status === "assinado" ? "Assinado" : "Pendente"}</span>
-            </div>
-          );
-        case "actions":
-          return (
-            <TableActions
-              onView={(doc) => handleOpenModal(doc, "view")}
-              onDelete={(doc) => handleOpenModal(doc, "delete")}
-              onEdit={(doc) => handleOpenModal(doc, "edit")}
-              documentData={document}
-            />
-          );
-        default:
-          return cellValue ? String(cellValue) : "";
-      }
-    },
-    [handleOpenModal]
-  );
 
   const onRowsPerPageChange = useCallback((e: ChangeEvent<HTMLSelectElement>) => {
     setRowsPerPage(Number(e.target.value));
@@ -136,43 +106,28 @@ export default function DocumentTable() {
 
   const onSearchChange = useCallback((value?: string) => {
     setFilterValue(value || "");
-    if (value) setPage(1);
+    setPage(1);
   }, []);
 
-  const classNames = useMemo(
-    () => ({
-      table: "min-w-full divide-y divide-gray-200 dark:divide-gray-700",
-      wrapper: [
-        "overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700",
-        "bg-white dark:bg-gray-800 shadow-sm",
-        "scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600",
-        "scrollbar-track-gray-100 dark:scrollbar-track-gray-700",
-      ],
-      th: [
-        "px-4 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-100",
-        "bg-gray-50 dark:bg-gray-700/50",
-      ],
-      td: [
-        "px-4 py-4 text-sm whitespace-nowrap",
-        "border-b border-gray-200 dark:border-gray-700",
-        "transition-colors hover:bg-gray-50/50 dark:hover:bg-gray-700/50",
-      ],
-      tr: "transition-colors hover:bg-gray-50/50 dark:hover:bg-gray-700/50",
-      baseRow: "transition-colors hover:bg-gray-50/50 dark:hover:bg-gray-700/50",
-      selectedRow: "bg-blue-50 dark:bg-blue-900/20",
-    }),
-    []
-  );
-
-  const validItems = Array.isArray(sortedItems) ? sortedItems : [];
+  const classNames = useMemo(() => ({
+    wrapper: ["max-h-[382px]", "max-w-3xl"],
+    th: ["bg-transparent", "text-default-500", "border-b", "border-divider"],
+    td: ["py-3"]
+  }), []);
 
   return (
     <>
       <Table
         isCompact
         removeWrapper
+        aria-label="Tabela de Documentos"
         bottomContent={
-          <TableBottomContent page={page} pages={pages} hasSearchFilter={hasSearchFilter} setPage={setPage} />
+          <TableBottomContent 
+            page={page} 
+            pages={Math.ceil((meta?.total ?? 0) / rowsPerPage)} 
+            hasSearchFilter={Boolean(filterValue)} 
+            setPage={setPage} 
+          />
         }
         bottomContentPlacement="outside"
         classNames={classNames}
@@ -195,23 +150,23 @@ export default function DocumentTable() {
         onSelectionChange={setSelectedKeys}
         onSortChange={setSortDescriptor}
       >
-        <TableHeader columns={headerColumns}>
+        <TableHeader columns={documentColumns.filter(c => Array.from(visibleColumns).includes(c.uid))}>
           {(column) => (
-            <TableColumn key={column.uid} align={column.uid === "actions" ? "center" : "start"} allowsSorting={column.sortable} className="text-md font-medium">
+            <TableColumn key={column.uid} align={column.uid === "actions" ? "center" : "start"} allowsSorting={column.sortable}>
               {column.name}
             </TableColumn>
           )}
         </TableHeader>
-          <TableBody
+        <TableBody
           emptyContent="Sem documentos para exibir"
-          items={validItems}
+          items={sortedItems}
           loadingContent={<TableLoading />}
           loadingState={isLoading ? "loading" : "idle"}
         >
           {(item) => (
             <TableRow key={item.id}>
               {(columnKey) => (
-                <TableCell className="text-md">
+                <TableCell>
                   {renderCell(item, columnKey as keyof Document | "actions")}
                 </TableCell>
               )}
@@ -220,9 +175,9 @@ export default function DocumentTable() {
         </TableBody>
       </Table>
 
-      <DocumentViewDialog isOpen={isViewDialogOpen} onClose={() => { setIsViewDialogOpen(false); setDocumentData(undefined); }} documentData={documentData} />
-      <DocumentDeleteDialog isOpen={isDeleteDialogOpen} onClose={() => { setIsDeleteDialogOpen(false); setDocumentData(undefined); }} documentId={documentData?.id || ""} />
-      <DocumentEditDialog isOpen={isEditDialogOpen} onClose={() => { setIsEditDialogOpen(false); setDocumentData(undefined); }} documentData={documentData} />
+      <DocumentViewDialog isOpen={isViewDialogOpen} onClose={() => setIsViewDialogOpen(false)} documentData={documentData} />
+      <DocumentDeleteDialog isOpen={isDeleteDialogOpen} onClose={() => setIsDeleteDialogOpen(false)} documentId={documentData?.id || ""} />
+      <DocumentEditDialog isOpen={isEditDialogOpen} onClose={() => setIsEditDialogOpen(false)} documentData={documentData} />
     </>
   );
 }
