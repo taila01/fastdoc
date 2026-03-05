@@ -60,43 +60,53 @@ export default function DocumentDeleteDialog({ documentId, isOpen, onClose }: Do
     onClose();
   };
 
-  if (!isOpen) return null;
-
   return (
     <CustomModal
-      title="Excluir documento"
-      backdrop="blur"
-      size="md"
-      hideSecondaryButton={false}
-      primaryButtonText="Confirmar"
-      secondaryButtonText="Cancelar"
-      onPrimaryAction={handleDelete}
-      hidePrimaryButton={!isChecked || isPending}
       isOpen={isOpen}
       onClose={handleClose}
+      title="Excluir documento"
+      backdrop="blur"
+      size="lg"
+      onPrimaryAction={handleDelete}
+      primaryButtonText="Confirmar Exclusão"
+      secondaryButtonText="Cancelar"
+      hidePrimaryButton={!isChecked || isPending}
+      classNames={{
+        base: "bg-zinc-900 border border-gray-800 rounded-2xl overflow-hidden shadow-2xl",
+        header: "border-b border-gray-800 text-white py-6 px-8 font-semibold",
+        closeButton: "top-6 right-6 p-2 hover:bg-white/5 text-gray-400 transition-all rounded-full scale-110",
+        footer: "border-t border-gray-800 p-6",
+        body: "p-0"
+      }}
     >
-      <div className="w-full max-w-md p-6 text-gray-800">
-        <div className="flex items-center mb-4 text-red-600">
-          <SiRenren className="mr-2 w-6 h-6" />
-          <h2 className="text-2xl font-bold">Excluir Documento</h2>
-        </div>
-        <p className="mb-4 text-lg text-gray-600 dark:text-gray-300">
-          Tem certeza de que deseja excluir o documento
-          <span className="font-bold ml-1">{document?.titulo || 'este documento'}</span>?
-        </p>
-        <div className="mb-4">
-          <label className="flex items-center text-sm mb-2">
-            <input
-              type="checkbox"
-              checked={isChecked}
-              onChange={(e) => setIsChecked(e.target.checked)}
-              className="mr-2 cursor-pointer rounded-md size-5"
-            />
-            <p className="dark:text-white/70 text-lg">
-              Confirmo que desejo excluir o documento
-              <strong className="ml-1">{document?.titulo}</strong>.
-            </p>
-          </label>
+      <div className="p-8 bg-zinc-900 space-y-6">
+        <div className="w-full rounded-2xl border border-red-900/30 bg-white/3 p-6">
+          <div className="flex items-center mb-4 text-red-500">
+            <SiRenren className="mr-3 w-8 h-8" />
+            <h2 className="text-xl font-bold">Atenção!</h2>
+          </div>
+          
+          <p className="mb-6 text-zinc-300 leading-relaxed">
+            Tem certeza de que deseja excluir o documento 
+            <span className="font-bold text-white ml-1 underline decoration-red-500/50">
+              {document?.titulo || 'este documento'}
+            </span>? Esta ação não poderá ser desfeita.
+          </p>
+
+          <div className="bg-red-500/5 rounded-xl border border-red-500/10 p-4">
+            <label className="flex items-start gap-3 cursor-pointer group">
+              <input
+                type="checkbox"
+                checked={isChecked}
+                onChange={(e) => setIsChecked(e.target.checked)}
+                className="mt-1 cursor-pointer rounded border-gray-700 bg-zinc-800 text-red-600 focus:ring-red-600 size-5 transition-all"
+              />
+              <span className="text-zinc-400 group-hover:text-zinc-200 transition-colors text-sm">
+                Confirmo que desejo excluir permanentemente o documento 
+                <strong className="text-zinc-200 ml-1">{document?.titulo}</strong>.
+              </span>
+            </label>
+          </div>
         </div>
       </div>
     </CustomModal>

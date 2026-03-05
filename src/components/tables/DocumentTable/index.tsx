@@ -42,7 +42,7 @@ export default function DocumentTable() {
 
   const meta = data?.meta;
   const visibleColumns = useMemo(() => new Set(INITIAL_VISIBLE_COLUMNS), []);
-  
+
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
@@ -51,6 +51,18 @@ export default function DocumentTable() {
     column: "titulo",
     direction: "ascending",
   });
+
+  const handleDownload = useCallback((doc: Document) => {
+    const blob = new Blob([doc.descricao || ""], { type: "text/plain" });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = doc.titulo?.endsWith(".txt") ? doc.titulo : `${doc.titulo}.txt`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+  }, []);
 
   const handleOpenModal = useCallback((doc: Document, type: "view" | "delete" | "edit") => {
     setDocumentData(doc);
@@ -64,16 +76,19 @@ export default function DocumentTable() {
 
     switch (columnKey) {
       case "titulo":
-        return <p className="font-medium text-md">{document.titulo || ""}</p>;
+        return <p className="font-semibold text-zinc-100 text-sm">{document.titulo || ""}</p>;
       case "descricao":
-        return <p className="text-md">{document.descricao || ""}</p>;
+        return <p className="text-zinc-400 text-sm line-clamp-1">{document.descricao || ""}</p>;
       case "criado_em":
-        return <p className="text-md">{document.criado_em ? formatDate(document.criado_em) : ""}</p>;
+        return <p className="text-zinc-300 text-sm">{document.criado_em ? formatDate(document.criado_em) : ""}</p>;
       case "status":
+        const isAssinado = document.status === "assinado";
         return (
           <div className="flex items-center gap-2">
-            <span className={`w-2 h-2 rounded-full ${document.status === "assinado" ? "bg-green-500" : "bg-gray-400"}`} />
-            <span>{document.status === "assinado" ? "Assinado" : "Pendente"}</span>
+            <span className={`w-2 h-2 rounded-full ${isAssinado ? "bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.4)]" : "bg-zinc-500"}`} />
+            <span className={`text-sm ${isAssinado ? "text-green-500 font-medium" : "text-zinc-400"}`}>
+              {isAssinado ? "Assinado" : "Pendente"}
+            </span>
           </div>
         );
       case "actions":
@@ -82,13 +97,14 @@ export default function DocumentTable() {
             onView={(doc) => handleOpenModal(doc, "view")}
             onDelete={(doc) => handleOpenModal(doc, "delete")}
             onEdit={(doc) => handleOpenModal(doc, "edit")}
+            onDownload={handleDownload}
             documentData={document}
           />
         );
       default:
-        return cellValue ? String(cellValue) : "";
+        return <span className="text-zinc-300 text-sm">{cellValue ? String(cellValue) : ""}</span>;
     }
-  }, [handleOpenModal]);
+  }, [handleOpenModal, handleDownload]);
 
   const sortedItems = useMemo(() => {
     return [...documentsData].sort((a, b) => {
@@ -109,42 +125,50 @@ export default function DocumentTable() {
     setPage(1);
   }, []);
 
-  const classNames = useMemo(() => ({
-    wrapper: ["max-h-[382px]", "max-w-3xl"],
-    th: ["bg-transparent", "text-default-500", "border-b", "border-divider"],
-    td: ["py-3"]
+  const tableClassNames = useMemo(() => ({
+    base: "w-full overflow-hidden rounded-2xl border border-gray-800 bg-zinc-900 shadow-2xl",
+    table: "min-w-full",
+    thead: "bg-white/3 [&>tr]:first:rounded-none",
+    th: "bg-transparent text-zinc-400 font-bold py-4 px-6 border-b border-gray-800 uppercase text-xs tracking-wider",
+    tbody: "divide-y divide-gray-800/50",
+    tr: "group hover:bg-white/2 transition-all cursor-default",
+    td: "py-4 px-6 text-zinc-300 transition-colors group-hover:text-zinc-100",
   }), []);
 
   return (
-    <>
+    <div className="w-full space-y-4">
       <Table
         isCompact
         removeWrapper
         aria-label="Tabela de Documentos"
         bottomContent={
-          <TableBottomContent 
-            page={page} 
-            pages={Math.ceil((meta?.total ?? 0) / rowsPerPage)} 
-            hasSearchFilter={Boolean(filterValue)} 
-            setPage={setPage} 
-          />
+          <div className="px-2 py-4 border-t border-gray-800 bg-zinc-900/50 rounded-b-2xl">
+            <TableBottomContent
+              page={page}
+              pages={Math.ceil((meta?.total ?? 0) / rowsPerPage)}
+              hasSearchFilter={Boolean(filterValue)}
+              setPage={setPage}
+            />
+          </div>
         }
         bottomContentPlacement="outside"
-        classNames={classNames}
+        classNames={tableClassNames}
         selectedKeys={selectedKeys}
         sortDescriptor={sortDescriptor}
         topContent={
-          <TableTopContent
-            filterValue={filterValue}
-            statusFilter={statusFilter}
-            visibleColumns={visibleColumns}
-            onSearchChange={onSearchChange}
-            setFilterValue={setFilterValue}
-            setStatusFilter={setStatusFilter}
-            onRowsPerPageChange={onRowsPerPageChange}
-            rowsPerPage={rowsPerPage}
-            meta={meta}
-          />
+          <div className="p-4 bg-zinc-900 rounded-t-2xl border-b border-gray-800">
+            <TableTopContent
+              filterValue={filterValue}
+              statusFilter={statusFilter}
+              visibleColumns={visibleColumns}
+              onSearchChange={onSearchChange}
+              setFilterValue={setFilterValue}
+              setStatusFilter={setStatusFilter}
+              onRowsPerPageChange={onRowsPerPageChange}
+              rowsPerPage={rowsPerPage}
+              meta={meta}
+            />
+          </div>
         }
         topContentPlacement="inside"
         onSelectionChange={setSelectedKeys}
@@ -152,13 +176,17 @@ export default function DocumentTable() {
       >
         <TableHeader columns={documentColumns.filter(c => Array.from(visibleColumns).includes(c.uid))}>
           {(column) => (
-            <TableColumn key={column.uid} align={column.uid === "actions" ? "center" : "start"} allowsSorting={column.sortable}>
+            <TableColumn 
+              key={column.uid} 
+              align={column.uid === "actions" ? "center" : "start"} 
+              allowsSorting={column.sortable}
+            >
               {column.name}
             </TableColumn>
           )}
         </TableHeader>
         <TableBody
-          emptyContent="Sem documentos para exibir"
+          emptyContent={<div className="py-20 text-zinc-500 font-medium">Nenhum documento encontrado.</div>}
           items={sortedItems}
           loadingContent={<TableLoading />}
           loadingState={isLoading ? "loading" : "idle"}
@@ -175,9 +203,23 @@ export default function DocumentTable() {
         </TableBody>
       </Table>
 
-      <DocumentViewDialog isOpen={isViewDialogOpen} onClose={() => setIsViewDialogOpen(false)} documentData={documentData} />
-      <DocumentDeleteDialog isOpen={isDeleteDialogOpen} onClose={() => setIsDeleteDialogOpen(false)} documentId={documentData?.id || ""} />
-      <DocumentEditDialog isOpen={isEditDialogOpen} onClose={() => setIsEditDialogOpen(false)} documentData={documentData} />
-    </>
+      <DocumentViewDialog
+        isOpen={isViewDialogOpen}
+        onClose={() => setIsViewDialogOpen(false)}
+        documentData={documentData}
+      />
+
+      <DocumentDeleteDialog
+        isOpen={isDeleteDialogOpen}
+        onClose={() => setIsDeleteDialogOpen(false)}
+        documentId={documentData?.id || ""}
+      />
+
+      <DocumentEditDialog
+        isOpen={isEditDialogOpen}
+        onClose={() => setIsEditDialogOpen(false)}
+        documentData={documentData}
+      />
+    </div>
   );
 }

@@ -1,28 +1,37 @@
+'use client';
+
 import React from 'react';
 import { Spinner } from "@heroui/react";
 import { FaDatabase } from "react-icons/fa";
 
 const TableLoading: React.FC = () => {
     return (
-        <div className="w-full flex flex-col items-center justify-center py-16 bg-gray-50/50 dark:bg-gray-800/50 rounded-lg backdrop-blur-sm">
-            <div className="relative">
+        <div className="w-full flex flex-col items-center justify-center py-20 bg-zinc-900 border border-gray-800 rounded-2xl shadow-xl overflow-hidden">
+            <div className="relative flex items-center justify-center">
                 <div className="absolute inset-0 flex items-center justify-center">
-                    <Spinner size="lg" color="primary" className="z-10" />
+                    <Spinner size="lg" color="secondary" className="scale-125" />
                 </div>
-                <div className="p-4 bg-primary-50 dark:bg-primary-900/30 rounded-full">
-                    <FaDatabase className="w-8 h-8 text-primary-400 dark:text-primary-500 opacity-50" />
+                <div className="p-6 bg-white/3 border border-gray-800 rounded-full backdrop-blur-md">
+                    <FaDatabase className="w-8 h-8 text-indigo-500 opacity-60" />
                 </div>
             </div>
-            <div className="mt-4 space-y-2 text-center">
-                <p className="text-lg font-medium text-gray-700 dark:text-gray-300">
-                    Carregando dados...
+            
+            <div className="mt-8 space-y-2 text-center">
+                <h3 className="text-xl font-semibold text-zinc-100 tracking-tight">
+                    Carregando dados
+                </h3>
+                <p className="text-sm text-zinc-400 max-w-62.5">
+                    Por favor, aguarde enquanto sincronizamos as informações.
                 </p>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                    Por favor, aguarde enquanto processamos as informações
-                </p>
+            </div>
+
+            <div className="mt-6 flex gap-1">
+                <div className="w-1.5 h-1.5 rounded-full bg-indigo-800 animate-pulse" />
+                <div className="w-1.5 h-1.5 rounded-full bg-indigo-800 animate-pulse delay-150" />
+                <div className="w-1.5 h-1.5 rounded-full bg-indigo-800 animate-pulse delay-300" />
             </div>
         </div>
     );
 };
 
-export default TableLoading; 
+export default TableLoading;

@@ -6,7 +6,7 @@ import { IoChevronBack } from "react-icons/io5";
 import { Button } from "@heroui/react";
 
 interface ComponentCardProps {
-  title?: any;
+  title?: React.ReactNode;
   aside?: React.ReactNode;
   children: React.ReactNode;
   className?: string;
@@ -23,34 +23,33 @@ interface ComponentCardProps {
   };
 }
 
-const ComponentCard = ({
+const ComponentCard: React.FC<ComponentCardProps> = ({
   title,
   children,
   aside,
   className = "",
-  desc = "",
+  desc,
   backButtonRoute,
   headerButton
-}: ComponentCardProps) => {
-
+}) => {
   const router = useRouter();
 
   return (
     <div
-      className={`rounded-2xl border mr-0 sm:mr-3 border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03] ${className}`}
+      className={`rounded-2xl border mr-0 sm:mr-3 border-gray-200 bg-white dark:border-gray-800 dark:bg-white/3 ${className}`}
     >
       <div className="px-4 sm:px-6 py-4 sm:py-5 flex flex-col sm:flex-row justify-between sm:items-center gap-4 sm:gap-0">
         
         <div className="w-full">
-          
           <div className="w-full flex flex-col sm:flex-row justify-between sm:items-center gap-3 sm:gap-0">
             
-            <h3 className="text-base font-medium text-gray-800 dark:text-white/90">
-              {title}
-            </h3>
+            {title && (
+              <h3 className="text-base font-medium text-gray-800 dark:text-white/90">
+                {title}
+              </h3>
+            )}
 
             <div className="flex items-center gap-2 sm:gap-4 flex-wrap">
-              
               {headerButton && (
                 <Button
                   variant={headerButton.variant || "light"}
@@ -68,9 +67,7 @@ const ComponentCard = ({
               )}
 
               {aside}
-
             </div>
-
           </div>
 
           {desc && (
@@ -78,7 +75,6 @@ const ComponentCard = ({
               {desc}
             </p>
           )}
-
         </div>
 
         {backButtonRoute && (
@@ -90,7 +86,6 @@ const ComponentCard = ({
             Voltar
           </button>
         )}
-
       </div>
 
       <div className="py-3 border-t border-gray-300 dark:border-gray-800 overflow-visible">
@@ -98,7 +93,6 @@ const ComponentCard = ({
           {children}
         </div>
       </div>
-
     </div>
   );
 };

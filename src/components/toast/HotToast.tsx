@@ -120,7 +120,7 @@ export const HotToast = ({
         <div className="p-3">
           <div className="flex items-start gap-3">
             {/* Ícone menor */}
-            <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${type === 'success' ? 'bg-green-100 dark:bg-green-900/50' :
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${type === 'success' ? 'bg-green-100 dark:bg-green-900/50' :
               type === 'error' ? 'bg-red-100 dark:bg-red-900/50' :
                 type === 'warning' ? 'bg-orange-100 dark:bg-orange-900/50' :
                   type === 'loading' ? 'bg-blue-100 dark:bg-blue-900/50' :
@@ -155,7 +155,7 @@ export const HotToast = ({
             {type !== 'loading' && (
               <button
                 onClick={() => toast.dismiss(t.id)}
-                className="flex-shrink-0 p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                className="shrink-0 p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
               >
                 <FaX className="w-3 h-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" />
               </button>

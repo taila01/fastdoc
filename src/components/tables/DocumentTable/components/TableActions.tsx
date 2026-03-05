@@ -16,6 +16,7 @@ interface TableActionsProps {
   onView: (document: Document) => void;
   onDelete: (document: Document) => void;
   onEdit: (document: Document) => void;
+  onDownload: (document: Document) => void;
   documentData: Document;
 }
 
@@ -23,14 +24,12 @@ export default function TableActions({
   onView,
   onDelete,
   onEdit,
+  onDownload,
   documentData
 }: TableActionsProps) {
-
   return (
     <div className="relative flex justify-start items-start gap-2">
-
       <Dropdown className="bg-background border border-default-200">
-
         <DropdownTrigger>
           <Button
             isIconOnly
@@ -46,7 +45,6 @@ export default function TableActions({
           aria-label="Ações do documento"
           className="text-center"
         >
-
           <DropdownItem
             key="view"
             onPress={() => onView(documentData)}
@@ -62,6 +60,13 @@ export default function TableActions({
           </DropdownItem>
 
           <DropdownItem
+            key="download"
+            onPress={() => onDownload(documentData)}
+          >
+            Baixar Documento
+          </DropdownItem>
+
+          <DropdownItem
             key="delete"
             className="text-danger"
             color="danger"
@@ -69,11 +74,8 @@ export default function TableActions({
           >
             Excluir Documento
           </DropdownItem>
-
         </DropdownMenu>
-
       </Dropdown>
-
     </div>
   );
 }

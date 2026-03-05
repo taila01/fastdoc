@@ -27,8 +27,8 @@ export default function EditDocumentDialog({ isOpen, onClose, documentData }: Ed
 
   useEffect(() => {
     if (documentData && isOpen) {
-      const timer = setTimeout(() => setFormData(documentData), 0);
-      return () => clearTimeout(timer);
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setFormData(documentData);
     }
   }, [documentData, isOpen]);
 
@@ -50,15 +50,9 @@ export default function EditDocumentDialog({ isOpen, onClose, documentData }: Ed
       toast.success("Documento atualizado com sucesso!");
       onClose();
     } catch (error: unknown) {
-      if (error instanceof Error) {
-        toast.error(error.message);
-      } else {
-        toast.error("Erro ao atualizar documento");
-      }
+      toast.error(error instanceof Error ? error.message : "Erro ao atualizar documento");
     }
   };
-
-  if (!isOpen) return null;
 
   return (
     <CustomModal
@@ -67,23 +61,52 @@ export default function EditDocumentDialog({ isOpen, onClose, documentData }: Ed
       title="Editar Documento"
       backdrop="blur"
       size="lg"
-      hideSecondaryButton={false}
+      onPrimaryAction={handleUpdateDocument}
       primaryButtonText="Salvar"
       secondaryButtonText="Cancelar"
-      onPrimaryAction={handleUpdateDocument}
+      classNames={{
+        base: "bg-zinc-900 border border-gray-800 rounded-2xl overflow-hidden",
+        header: "border-b border-gray-800 text-white py-6 px-8 font-semibold",
+        closeButton: "top-6 right-6 p-2 hover:bg-white/[0.05] text-gray-400 transition-all rounded-full scale-110",
+        footer: "border-t border-gray-800 p-6",
+        body: "p-0"
+      }}
     >
-      <div className="px-4 py-3">
-        <Label>Título</Label>
-        <Input id="titulo" value={formData.titulo} onChange={handleInputChange} />
+      <div className="p-8 bg-zinc-900 space-y-6">
+        <div className="w-full rounded-2xl border border-gray-800 bg-white/3 p-6 space-y-4">
+          <div>
+            <Label className="text-zinc-400 mb-2 block text-sm">Título</Label>
+            <Input 
+              id="titulo" 
+              value={formData.titulo} 
+              onChange={handleInputChange} 
+              className="bg-white/3 border-gray-800 text-white rounded-xl h-11 focus:border-indigo-800 transition-all"
+            />
+          </div>
 
-        <Label>Descrição</Label>
-        <Input id="descricao" value={formData.descricao} onChange={handleInputChange} />
+          <div>
+            <Label className="text-zinc-400 mb-2 block text-sm">Descrição</Label>
+            <Input 
+              id="descricao" 
+              value={formData.descricao} 
+              onChange={handleInputChange} 
+              className="bg-white/3 border-gray-800 text-white rounded-xl h-11 focus:border-indigo-800 transition-all"
+            />
+          </div>
 
-        <Label>Status</Label>
-        <select id="status" value={formData.status} onChange={handleInputChange} className="w-full rounded-md border p-2 mt-1">
-          <option value="pendente">Pendente</option>
-          <option value="assinado">Assinado</option>
-        </select>
+          <div>
+            <Label className="text-zinc-400 mb-2 block text-sm">Status</Label>
+            <select 
+              id="status" 
+              value={formData.status} 
+              onChange={handleInputChange} 
+              className="w-full h-11 px-3 bg-white/3 border border-gray-800 rounded-xl text-zinc-100 focus:border-indigo-800 outline-none transition-all appearance-none cursor-pointer"
+            >
+              <option className="bg-zinc-900" value="pendente">Pendente</option>
+              <option className="bg-zinc-900" value="assinado">Assinado</option>
+            </select>
+          </div>
+        </div>
       </div>
     </CustomModal>
   );

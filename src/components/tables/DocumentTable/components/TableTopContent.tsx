@@ -1,8 +1,11 @@
+'use client';
+
 import { Input } from "@heroui/react";
 import { FaSearch } from "react-icons/fa";
 import { Selection } from "@heroui/react";
+import { useRouter } from "next/navigation";
 
-interface DocumentTableTopContentProps {
+interface TableTopContentProps {
   filterValue: string;
   statusFilter: Selection;
   visibleColumns: Selection;
@@ -16,18 +19,16 @@ interface DocumentTableTopContentProps {
   };
 }
 
-export function capitalize(s: string) {
-  return s ? s.charAt(0).toUpperCase() + s.slice(1).toLowerCase() : "";
-}
-
-export default function DocumentTableTopContent({
+export default function TableTopContent({
   filterValue,
   onSearchChange,
   setFilterValue,
   onRowsPerPageChange,
   rowsPerPage,
   meta,
-}: DocumentTableTopContentProps) {
+}: TableTopContentProps) {
+  const router = useRouter();
+
   return (
     <div className="flex flex-col gap-4 px-1">
       <div className="flex justify-between gap-3 items-end">
@@ -53,18 +54,20 @@ export default function DocumentTableTopContent({
         <span className="text-default-400 text-md">
           Total de usuários: {meta?.total ?? 0}
         </span>
-        <label className="flex items-center text-default-400 text-md">
-          Documentos por página:
-          <select
-            className="bg-transparent border-0 border-transparent outline-none text-default-400 text-md focus:outline-none rounded-xl"
-            onChange={onRowsPerPageChange}
-            defaultValue={rowsPerPage}
-          >
-            <option value="5">5</option>
-            <option value="10">10</option>
-            <option value="15">15</option>
-          </select>
-        </label>
+        <div className="flex items-center gap-4">
+          <label className="flex items-center text-default-400 text-md">
+            Documentos por página:
+            <select
+              className="bg-transparent border-0 border-transparent outline-none text-default-400 text-md focus:outline-none rounded-xl ml-2"
+              onChange={onRowsPerPageChange}
+              defaultValue={rowsPerPage}
+            >
+              <option value="5">5</option>
+              <option value="10">10</option>
+              <option value="15">15</option>
+            </select>
+          </label>
+        </div>
       </div>
     </div>
   );
