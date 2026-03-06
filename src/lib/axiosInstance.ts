@@ -4,13 +4,14 @@ const axiosInstance: AxiosInstance = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3333",
   timeout: 10000,
   headers: {
-    "Content-Type": "application/json",
     Accept: "application/json",
   },
 });
 
 axiosInstance.interceptors.request.use(
-  (config: InternalAxiosRequestConfig) => config,
+  (config: InternalAxiosRequestConfig) => {
+    return config;
+  },
   (error) => Promise.reject(error)
 );
 

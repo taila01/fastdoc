@@ -1,29 +1,27 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createDocument } from "@/services/api/documents/documents";
-import { DocumentCreateData, Document } from "@/services/interfaces/Document/DocumentInterface";
+import { Document } from "@/services/interfaces/Document/DocumentInterface";
 
-interface ApiError {
-  message?: string;
+interface CreateDocumentPayload {
+  titulo: string;
+  conteudoTexto: string;
 }
 
 export const useCreateDocument = (onSuccessCallback?: (data: Document) => void) => {
   const queryClient = useQueryClient();
 
-  return useMutation<Document, Error, DocumentCreateData>({
-    mutationFn: async (data) => {
+  return useMutation<Document | null, Error, CreateDocumentPayload>({
+    mutationFn: async (data: CreateDocumentPayload) => {
       const response = await createDocument(data);
-
-      if (!response || (response as ApiError).message) {
-        const message = (response as ApiError).message || "Erro ao criar documento";
-        throw new Error(message);
+      if (!response) {
+        throw new Error("Erro ao criar documento");
       }
-
-      return response as Document;
+      return response;
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["documents"] });
       queryClient.invalidateQueries({ queryKey: ["document"] });
-      onSuccessCallback?.(data);
+      if (data) onSuccessCallback?.(data);
     },
     onError: (error: Error) => {
       console.error("Erro ao criar documento:", error.message);

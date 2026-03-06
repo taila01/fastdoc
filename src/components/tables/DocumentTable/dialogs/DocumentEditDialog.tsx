@@ -1,12 +1,14 @@
 'use client';
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { CustomModal } from "@/components/ui/HeroUI/Dialog";
-import toast from "react-hot-toast";
+import { HotToast } from "@/components/toast/HotToast";
 import { Document } from "@/services/interfaces/Document/DocumentInterface";
 import { useEditDocument } from "@/hooks/document/useUpdateDocument";
 import Input from "@/components/form/input/InputField";
 import Label from "@/components/form/Label";
+import { FaSave } from "react-icons/fa"; // Ícone para o botão
 
 interface EditDocumentDialogProps {
   isOpen: boolean;
@@ -25,12 +27,16 @@ export default function EditDocumentDialog({ isOpen, onClose, documentData }: Ed
     criado_em: new Date().toISOString()
   });
 
+  // Sincroniza os dados quando o modal abre
   useEffect(() => {
     if (documentData && isOpen) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setFormData(documentData);
     }
   }, [documentData, isOpen]);
+
+  const handleClose = useCallback(() => {
+    onClose();
+  }, [onClose]);
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -41,71 +47,102 @@ export default function EditDocumentDialog({ isOpen, onClose, documentData }: Ed
 
   const handleUpdateDocument = async () => {
     if (!formData.titulo.trim() || !formData.descricao.trim()) {
-      toast.error("Título e descrição são obrigatórios!");
+      HotToast({ title: "Atenção", message: "Título e descrição são obrigatórios!", type: "error" });
       return;
     }
 
     try {
       await editDocumentMutation.mutateAsync(formData);
-      toast.success("Documento atualizado com sucesso!");
-      onClose();
-    } catch (error: unknown) {
-      toast.error(error instanceof Error ? error.message : "Erro ao atualizar documento");
+      HotToast({ title: "Sucesso!", message: "Documento atualizado!", type: "success" });
+      handleClose();
+    } catch (error: any) {
+      HotToast({ 
+        title: "Erro", 
+        message: error?.message || "Erro ao atualizar documento", 
+        type: "error" 
+      });
     }
   };
 
   return (
     <CustomModal
       isOpen={isOpen}
-      onClose={onClose}
+      onClose={handleClose}
       title="Editar Documento"
-      backdrop="blur"
-      size="lg"
-      onPrimaryAction={handleUpdateDocument}
-      primaryButtonText="Salvar"
-      secondaryButtonText="Cancelar"
+      size="3xl"
+      isDismissable={false}
+      hideSecondaryButton // Ocultamos os botões padrão para usar o layout customizado
+      hidePrimaryButton
       classNames={{
-        base: "bg-zinc-900 border border-gray-800 rounded-2xl overflow-hidden",
-        header: "border-b border-gray-800 text-white py-6 px-8 font-semibold",
-        closeButton: "top-6 right-6 p-2 hover:bg-white/[0.05] text-gray-400 transition-all rounded-full scale-110",
-        footer: "border-t border-gray-800 p-6",
-        body: "p-0"
+        base: "bg-zinc-900 border border-gray-800 rounded-2xl max-w-[850px]",
+        header: "border-b border-gray-800 text-white p-6",
+        body: "p-0",
+        closeButton: "top-6 right-6 p-2 hover:bg-white/[0.05] text-gray-400 transition-all rounded-full"
       }}
     >
-      <div className="p-8 bg-zinc-900 space-y-6">
-        <div className="w-full rounded-2xl border border-gray-800 bg-white/3 p-6 space-y-4">
-          <div>
-            <Label className="text-zinc-400 mb-2 block text-sm">Título</Label>
-            <Input 
-              id="titulo" 
-              value={formData.titulo} 
-              onChange={handleInputChange} 
-              className="bg-white/3 border-gray-800 text-white rounded-xl h-11 focus:border-indigo-800 transition-all"
-            />
-          </div>
+      <div className="flex flex-col gap-6 p-8 bg-zinc-900">
+        <AnimatePresence mode="wait">
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="min-h-[300px] rounded-2xl border border-gray-800 bg-white/3 p-8 space-y-6"
+          >
+            {/* Campo Título */}
+            <div className="space-y-2">
+              <Label className="text-zinc-400 text-sm ml-1">Título do Documento</Label>
+              <Input 
+                id="titulo" 
+                value={formData.titulo} 
+                onChange={handleInputChange} 
+                placeholder="Ex: Contrato de Prestação de Serviços"
+                className="bg-white/5 border-gray-700 text-white rounded-xl h-12 focus:border-indigo-500 transition-all"
+              />
+            </div>
 
-          <div>
-            <Label className="text-zinc-400 mb-2 block text-sm">Descrição</Label>
-            <Input 
-              id="descricao" 
-              value={formData.descricao} 
-              onChange={handleInputChange} 
-              className="bg-white/3 border-gray-800 text-white rounded-xl h-11 focus:border-indigo-800 transition-all"
-            />
-          </div>
+            {/* Campo Descrição */}
+            <div className="space-y-2">
+              <Label className="text-zinc-400 text-sm ml-1">Descrição</Label>
+              <Input 
+                id="descricao" 
+                value={formData.descricao} 
+                onChange={handleInputChange} 
+                placeholder="Breve descrição do conteúdo"
+                className="bg-white/5 border-gray-700 text-white rounded-xl h-12 focus:border-indigo-500 transition-all"
+              />
+            </div>
 
-          <div>
-            <Label className="text-zinc-400 mb-2 block text-sm">Status</Label>
-            <select 
-              id="status" 
-              value={formData.status} 
-              onChange={handleInputChange} 
-              className="w-full h-11 px-3 bg-white/3 border border-gray-800 rounded-xl text-zinc-100 focus:border-indigo-800 outline-none transition-all appearance-none cursor-pointer"
-            >
-              <option className="bg-zinc-900" value="pendente">Pendente</option>
-              <option className="bg-zinc-900" value="assinado">Assinado</option>
-            </select>
-          </div>
+            {/* Campo Status */}
+            <div className="space-y-2">
+              <Label className="text-zinc-400 text-sm ml-1">Status Atual</Label>
+              <select 
+                id="status" 
+                value={formData.status} 
+                onChange={handleInputChange} 
+                className="w-full h-12 px-4 bg-white/5 border border-gray-700 rounded-xl text-zinc-100 focus:border-indigo-500 outline-none transition-all appearance-none cursor-pointer"
+              >
+                <option className="bg-zinc-900" value="pendente">Pendente</option>
+                <option className="bg-zinc-900" value="assinado">Assinado</option>
+              </select>
+            </div>
+          </motion.div>
+        </AnimatePresence>
+
+        <div className="pt-6 border-t border-gray-800/50 flex justify-end gap-3">
+          <button
+            onClick={handleClose}
+            className="px-6 py-2.5 rounded-full border border-gray-700 text-gray-400 hover:bg-white/5 transition-all text-sm font-medium"
+          >
+            Cancelar
+          </button>
+          <button
+            onClick={handleUpdateDocument}
+            disabled={editDocumentMutation.isPending}
+            className="flex items-center gap-2 px-8 py-2.5 rounded-full bg-indigo-600 hover:bg-indigo-500 text-white transition-all text-sm font-bold shadow-lg shadow-indigo-500/20 disabled:opacity-50"
+          >
+            {editDocumentMutation.isPending ? "Salvando..." : "Salvar Alterações"}
+            <FaSave className="text-xs" />
+          </button>
         </div>
       </div>
     </CustomModal>

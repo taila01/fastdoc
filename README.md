@@ -1,36 +1,55 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 📄 FastDoc - Gestão de Documentos
 
-## Getting Started
+Sistema moderno para gerenciamento, edição e visualização de documentos, construído com foco em **UI/UX consistente** e performance.
 
-First, run the development server:
+## ✨ Características Recentes (UI Refactor)
 
+A interface foi atualizada para um design **Dark Moderno** com as seguintes especificações:
+
+* **Design System:** Baseado em Zinc-900 com bordas Gray-800.
+* **Componentes:** Modais e botões com arredondamento total (`rounded-full` / `2xl`).
+* **Feedback:** Integração com `HotToast` para notificações de sucesso e erro.
+* **Animações:** Transições suaves de entrada e saída usando `Framer Motion`.
+
+## 🛠️ Tecnologias Utilizadas
+
+* **Framework:** [Next.js](https://nextjs.org/) (App Router)
+* **UI Library:** [HeroUI](https://heroui.com/)
+* **Estilização:** [Tailwind CSS](https://tailwindcss.com/)
+* **Ícones:** [React Icons](https://react-icons.github.io/react-icons/) (FA6)
+* **Animações:** [Framer Motion](https://www.framer.com/motion/)
+
+## 🚀 Como Executar o Projeto
+
+1. Instale as dependências:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+2. Execute o ambiente de desenvolvimento:
+```bash
+npm run dev
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
 
-## Learn More
 
-To learn more about Next.js, take a look at the following resources:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 📂 Estrutura de Componentes de UI
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+| Componente | Função | Estilo |
+| --- | --- | --- |
+| **EditDocumentDialog** | Edição de metadados | Dark / Rounded-2xl |
+| **DocumentViewDialog** | Visualização com Tabs | Underlined / Indigo Accent |
+| **TableActions** | Menu Dropdown de ações | Pill-shaped / Blur Backdrop |
+| **DocumentInfoSection** | Exibição de dados técnicos | Grid Layout / Zinc Theme |
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Desenvolvido por **Taila** ❤️
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+**Para fazer o commit rápido, você pode usar este comando no terminal:**
+`git add . && git commit -m "style: refactor document UI components and update readme"`

@@ -1,6 +1,6 @@
 import axios from "@/lib/axiosInstance";
 import { AxiosResponse } from "axios";
-import { Document, DocumentCreateData, DocumentIndexResponse, DocumentDeleteResponse } from "@/services/interfaces/Document/DocumentInterface";
+import { Document, DocumentIndexResponse, DocumentDeleteResponse } from "@/services/interfaces/Document/DocumentInterface";
 
 const API_BASE_URL = "/documentos";
 
@@ -13,7 +13,7 @@ export const getDocument = async (id: number): Promise<Document | null> => {
   }
 };
 
-export const createDocument = async (data: DocumentCreateData): Promise<Document | null> => {
+export const createDocument = async (data: { titulo: string; conteudoTexto: string }): Promise<Document | null> => {
   const response: AxiosResponse<Document> = await axios.post(API_BASE_URL, data);
   return response.data;
 };
@@ -25,7 +25,7 @@ export const editDocument = async (document: Document): Promise<Document> => {
 };
 
 export const signDocument = async (id: number): Promise<Document | null> => {
-  const response: AxiosResponse<Document> = await axios.patch(`${API_BASE_URL}/${id}/assinar`);
+  const response: AxiosResponse<Document | null> = await axios.patch(`${API_BASE_URL}/${id}/assinar`);
   return response.data;
 };
 

@@ -9,14 +9,12 @@ import {
 } from "@heroui/react";
 
 import { FaEllipsisV } from "react-icons/fa";
-
 import { Document } from "@/services/interfaces/Document/DocumentInterface";
 
 interface TableActionsProps {
   onView: (document: Document) => void;
   onDelete: (document: Document) => void;
   onEdit: (document: Document) => void;
-  onDownload: (document: Document) => void;
   documentData: Document;
 }
 
@@ -24,26 +22,40 @@ export default function TableActions({
   onView,
   onDelete,
   onEdit,
-  onDownload,
   documentData
 }: TableActionsProps) {
   return (
     <div className="relative flex justify-start items-start gap-2">
-      <Dropdown className="bg-background border border-default-200">
+      <Dropdown 
+        className="bg-zinc-900 border border-gray-800 shadow-2xl !rounded-[24px] min-w-[200px]"
+        backdrop="blur"
+      >
         <DropdownTrigger>
           <Button
             isIconOnly
             radius="full"
             size="md"
             variant="light"
+            className="hover:bg-white/10"
           >
-            <FaEllipsisV className="text-default-400" />
+            <FaEllipsisV className="text-zinc-400" />
           </Button>
         </DropdownTrigger>
 
         <DropdownMenu
           aria-label="Ações do documento"
-          className="text-center"
+          className="p-2"
+          itemClasses={{
+            base: [
+              "rounded-full", // Itens em formato de pílula
+              "px-4",
+              "py-2",
+              "text-zinc-300",
+              "data-[hover=true]:bg-white/10",
+              "data-[hover=true]:text-white",
+              "transition-all"
+            ],
+          }}
         >
           <DropdownItem
             key="view"
@@ -60,15 +72,8 @@ export default function TableActions({
           </DropdownItem>
 
           <DropdownItem
-            key="download"
-            onPress={() => onDownload(documentData)}
-          >
-            Baixar Documento
-          </DropdownItem>
-
-          <DropdownItem
             key="delete"
-            className="text-danger"
+            className="text-danger data-[hover=true]:bg-danger/10"
             color="danger"
             onPress={() => onDelete(documentData)}
           >
