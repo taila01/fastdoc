@@ -1,55 +1,44 @@
-# 📄 FastDoc - Gestão de Documentos
+# FastDoc - Sistema de Gestão de Documentos
 
-Sistema moderno para gerenciamento, edição e visualização de documentos, construído com foco em **UI/UX consistente** e performance.
+O FastDoc é uma plataforma voltada para o gerenciamento centralizado de documentos, desenvolvida com foco em alta performance de renderização, consistência de interface e experiência do usuário em fluxos administrativos.
 
-## ✨ Características Recentes (UI Refactor)
+## Tecnologias e Arquitetura
 
-A interface foi atualizada para um design **Dark Moderno** com as seguintes especificações:
+* **Frontend:** Next.js (App Router) para roteamento otimizado e Server-Side Rendering (SSR).
+* **Estilização:** Tailwind CSS com Design System customizado (Zinc/Gray Scale).
+* **Componentização:** HeroUI para componentes acessíveis e padronizados.
+* **Animações:** Framer Motion para transições de estado e feedback visual.
+* **Gerenciamento de Notificações:** React Hot Toast para validação de operações.
 
-* **Design System:** Baseado em Zinc-900 com bordas Gray-800.
-* **Componentes:** Modais e botões com arredondamento total (`rounded-full` / `2xl`).
-* **Feedback:** Integração com `HotToast` para notificações de sucesso e erro.
-* **Animações:** Transições suaves de entrada e saída usando `Framer Motion`.
+## Diferenciais Técnicos e Refatoração de UI
 
-## 🛠️ Tecnologias Utilizadas
+O sistema passou por uma atualização de interface para otimizar a usabilidade e a arquitetura de componentes:
 
-* **Framework:** [Next.js](https://nextjs.org/) (App Router)
-* **UI Library:** [HeroUI](https://heroui.com/)
-* **Estilização:** [Tailwind CSS](https://tailwindcss.com/)
-* **Ícones:** [React Icons](https://react-icons.github.io/react-icons/) (FA6)
-* **Animações:** [Framer Motion](https://www.framer.com/motion/)
+* **Design System:** Implementação de tema Dark (Zinc-900) focado em legibilidade e redução de fadiga visual.
+* **Feedback de Operações:** Integração de notificações em tempo real para sucesso ou erro em ações de CRUD.
+* **Micro-interações:** Uso de Framer Motion para suavizar a abertura de modais e transições de listas, melhorando a percepção de performance.
+* **Modularidade:** Componentes desenvolvidos seguindo princípios de reutilização, facilitando a manutenção e escalabilidade do código.
 
-## 🚀 Como Executar o Projeto
+## Estrutura de Componentes de UI
 
-1. Instale as dependências:
-```bash
-npm install
+| Componente | Responsabilidade Técnica | Padrão de Design |
+| :--- | :--- | :--- |
+| **EditDocumentDialog** | Edição assíncrona de metadados de arquivos. | Modal Rounded-2xl |
+| **DocumentViewDialog** | Visualização de detalhes com navegação por abas. | Tabs Underlined |
+| **TableActions** | Centralização de ações rápidas (Edit/Delete/View). | Dropdown com Blur |
+| **DocumentInfoSection** | Exibição de dados técnicos e logs do documento. | Grid Layout / Zinc Theme |
 
-```
+## Instruções para Execução
 
+1. Instalação de dependências:
+   ```bash
+   npm install
+   ```
 
-2. Execute o ambiente de desenvolvimento:
-```bash
-npm run dev
-
-```
-
-
-
-## 📂 Estrutura de Componentes de UI
-
-| Componente | Função | Estilo |
-| --- | --- | --- |
-| **EditDocumentDialog** | Edição de metadados | Dark / Rounded-2xl |
-| **DocumentViewDialog** | Visualização com Tabs | Underlined / Indigo Accent |
-| **TableActions** | Menu Dropdown de ações | Pill-shaped / Blur Backdrop |
-| **DocumentInfoSection** | Exibição de dados técnicos | Grid Layout / Zinc Theme |
+2. Execução do ambiente de desenvolvimento:
+   ```bash
+   npm run dev
+   ```
 
 ---
-
-Desenvolvido por **Taila** ❤️
-
----
-
-**Para fazer o commit rápido, você pode usar este comando no terminal:**
-`git add . && git commit -m "style: refactor document UI components and update readme"`
+**Desenvolvido por Taila**
